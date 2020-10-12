@@ -1,1 +1,4 @@
 bleak
+pypiwin32
+pybluez
+Pillow

@@ -3,21 +3,27 @@ from bleak import discover
 from bluetooth import discover_devices
 from time import time,sleep
 def isFlipped(b):
-    return True#str(int(int(''+b[10],16)+0x10,2))[3]=='0'
+    # return True#str(int(int(''+b[10],16)+0x10,2))[3]=='0'
+    return (int(b[10], 16) & 0x02) ==0
+    # return str(int(int(''+b[10],16) & 0x02))[3]=='0'
 async def run():
     devices = await discover()
     result = {'STATUS':0}
     for d in devices:
-        if True or d.rssi >=-690 and 76 in d.metadata['manufacturer_data'] and len(d.metadata['manufacturer_data'][76].hex())==54:
+        if d.rssi >=-690 and 76 in d.metadata['manufacturer_data'] and len(d.metadata['manufacturer_data'][76].hex())==54:
             print('================')
             #print(var_dump(d))
-            print(d.rssi)
+            # print(d)
+            # print(d.metadata['manufacturer_data'])
+            print('rssi: '+str(d.rssi))
             try:
                 data = d.metadata['manufacturer_data'][76]
                 b = data.hex()
                 print(b)
+
                 # print(len(b))
                 print(isFlipped(b))
+                flip = isFlipped(b)
 
                 if result['STATUS']!=1:
                     print('ADDR:'+d.address)
@@ -28,10 +34,15 @@ async def run():
                     result['RSSI'] = d.rssi
                     result['ADDR'] = d.address
                     result['MODEL'] = b[7]
-                    result['LEFT'] = b[12]
-                    result['RIGHT'] = b[13]
+                    result['LEFT'] = b[12 if flip else 13] 
+                    result['RIGHT'] = b[13 if flip else 12]
                     result['CASE'] = b[15]
+
+                    chargeStatus = int(b[14], 16)
                     result['CHARGE'] = b[14]
+                    result['CHARGE_L'] = (chargeStatus & (0b00000010 if flip else 0b00000001)) != 0
+                    result['CHARGE_R'] =(chargeStatus & (0b00000001 if flip else 0b00000010)) != 0
+                    result['CHARGE_CASE'] =(chargeStatus & 0b00000100) != 0
                     result['STATUS'] = 1
                 else:
                     if d.rssi > result['RSSI']:
@@ -41,7 +52,13 @@ async def run():
                         result['LEFT'] = b[12]
                         result['RIGHT'] = b[13]
                         result['CASE'] = b[15]
+
+                        chargeStatus = int(b[14], 16)
                         result['CHARGE'] = b[14]
+                        result['CHARGE_L'] = (chargeStatus & (0b00000010 if flip else 0b00000001)) != 0
+                        result['CHARGE_R'] =(chargeStatus & (0b00000001 if flip else 0b00000010)) != 0
+                        result['CHARGE_CASE'] =(chargeStatus & 0b00000100) != 0
+
                         result['STATUS'] = 1
             except Exception as e:
                 #pass

@@ -327,14 +327,16 @@ class _Main:
             self.window.title('WinPods refreshing')
             result = get_status.fetch_status()
             print(result)
+
             if result['STATUS'] == 1 and validate_result(result):
-                left_battery_dir = resource_path('./img/' + str(result['LEFT']) + '.png')
-                right_battery_dir = resource_path('./img/' + str(result['RIGHT']) + '.png')
-                case_battery_dir = resource_path('./img/' + str(result['CASE']) + '.png')
+                left_battery_dir = resource_path('./img/' + str(result['LEFT'] + 1) + '.png')
+                right_battery_dir = resource_path('./img/' + str(result['RIGHT'] + 1) + '.png')
+                case_battery_dir = resource_path('./img/' + str(result['CASE'] + 1) + '.png')
             else:
                 left_battery_dir = resource_path('./img/f.png')
                 right_battery_dir = resource_path('./img/f.png')
                 case_battery_dir = resource_path('./img/f.png')
+                continue
             if result['MODEL']=='1':
                 self.window.title('AirPods Gen 1')
             if result['MODEL']=='2':
@@ -343,7 +345,8 @@ class _Main:
                 self.window.title('AirPods Pro')
             #Bit 0 (LSB) is the left pod; Bit 1 is the right pod; Bit 2 is the case.
 
-            charging_status = str(str(bin(int(result['CHARGE'])))+'b')[2:-1]
+            # charging_status = str(str(bin(int(result['CHARGE'])))+'b')[2:-1]
+            charging_status = '000'
             charging_img_left = ImageTk.PhotoImage(Image.open(resource_path('./img/charging-'+charging_status[-1]+'.png')))
             charging_img_right = ImageTk.PhotoImage(Image.open(resource_path('./img/charging-' + charging_status[-2]+'.png')))
             charging_img_case = ImageTk.PhotoImage(Image.open(resource_path('./img/charging-' + charging_status[-3]+'.png')))
