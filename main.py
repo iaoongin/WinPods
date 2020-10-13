@@ -116,6 +116,21 @@ class SysTrayIcon(object):
             win32gui.Shell_NotifyIcon(win32gui.NIM_DELETE, nid)
             win32gui.PostQuitMessage(0)  # 退出托盘图标
             if Main: Main.window.deiconify()
+        # elif lparam == win32con.WM_MOUSEMOVE: # 鼠标悬浮
+        #     # print('悬浮')
+        #     nid = (s.hwnd,  # 句柄s
+        #        0,  # 托盘图标ID
+        #        win32gui.NIF_INFO,  # 标识
+        #        0,  # 回调消息ID
+        #        0,  # 托盘图标句柄
+        #        "TestMessage",  # 图标字符串
+        #        msg,  # 气球提示字符串
+        #        0,  # 提示的显示时间
+        #        "标题",  # 提示标题
+        #        win32gui.NIIF_INFO  # 提示用到的图标
+        #     )
+        #     win32gui.Shell_NotifyIcon(win32gui.NIM_MODIFY, nid)
+
         return True
         """ 可能的鼠标事件：
         WM_MOUSEMOVE
@@ -329,9 +344,9 @@ class _Main:
             print(result)
 
             if result['STATUS'] == 1 and validate_result(result):
-                left_battery_dir = resource_path('./img/' + str(result['LEFT'] + 1) + '.png')
-                right_battery_dir = resource_path('./img/' + str(result['RIGHT'] + 1) + '.png')
-                case_battery_dir = resource_path('./img/' + str(result['CASE'] + 1) + '.png')
+                left_battery_dir = resource_path('./img/' + str(result['LEFT']) + '.png')
+                right_battery_dir = resource_path('./img/' + str(result['RIGHT']) + '.png')
+                case_battery_dir = resource_path('./img/' + str(result['CASE'] ) + '.png')
             else:
                 left_battery_dir = resource_path('./img/f.png')
                 right_battery_dir = resource_path('./img/f.png')
@@ -372,6 +387,10 @@ class _Main:
 
             self.battery_case_label.config(image=img_case)
             self.battery_case_label.image = img_case
+
+
+            # 托盘提示
+            self.sysTrayIcon.hover_text = "LEFT: "+ result['LEFT'] + "0%\nRIGHT: " +  result['RIGHT']+"0%"
 
             sleep(5)
 
